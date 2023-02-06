@@ -6,5 +6,6 @@ This repo will contain the whole project which needs to be done for the course. 
 
 ## Authors
 
-Nicco Vögeli (nicco.voegeli@stud.hslu.ch)\n
+Nicco Vögeli (nicco.voegeli@stud.hslu.ch)
+
 Roger Waldvogel (roger.waldvogel@stud.hslu.ch)
