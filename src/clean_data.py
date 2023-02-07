@@ -1,27 +1,34 @@
 # git checkout nicco
 
-import pandas as pd
 import os
 import re
 from PIL import Image
 import numpy as np
+import tensorflow as tf
 
-# get folder names --> class names
-fldrs = os.listdir("data/Kather_texture_2016_image_tiles_5000")
-cls_names = ([re.sub(r"\d+", "", cls) .lstrip("_") for cls in fldrs])
 
-# read the images to array
-data_array = raw_dat_array = []
-for fldr in fldrs:
-    print(fldr)
-    fldr_path = "data/Kather_texture_2016_image_tiles_5000/" + fldr
-    files = os.listdir(fldr_path)
-    tmp = raw_array = []
-    for file in files:
-        img = Image.open(fldr_path + "/" + file)
-        imarray = np.array(img)
-        raw_array.append(img)
-        tmp.append(imarray)
-    data_array.append(tmp)
-    raw_dat_array.append(raw_array)
+def normalize_resize(input_image):
+  input_image = tf.cast(input_image, tf.float32) / 255.0
+  input_image = tf.image.resize(input_image, (150, 150))
+  return input_image
 
+
+def get_data(path: str):
+    fldrs = os.listdir(path)
+    cls_names = ([re.sub(r"\d+", "", cls).lstrip("_") for cls in fldrs])
+    data_array = []
+    for fldr in fldrs:
+        print(fldr)
+        fldr_path = path + "/" + fldr
+        print(fldr_path)
+        files = os.listdir(fldr_path)
+        tmp = []
+        for file in files:
+            img = Image.open(fldr_path + "/" + file)
+            imarray = normalize_resize(np.array(img))
+            tmp.append(imarray)
+        data_array.append(tmp)
+    return cls_names, data_array
+
+
+test=1
