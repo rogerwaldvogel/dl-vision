@@ -4,6 +4,7 @@ from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.preprocessing.image import load_img
 from tensorflow.keras.utils import to_categorical
 import re
+import random
 
 
 def get_label(folder):
@@ -23,4 +24,7 @@ def get_data(path):
             labels.append(get_label(folder))
 
     labels = to_categorical(labels)
+    combined = list(zip(data, labels))
+    random.shuffle(combined)
+    data[:], labels[:] = zip(*combined)
     return data, labels
