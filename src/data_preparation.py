@@ -5,10 +5,11 @@ from tensorflow.keras.preprocessing.image import load_img
 from tensorflow.keras.utils import to_categorical
 import re
 import random
+import numpy as np
 
 
 def get_label(folder):
-    return int(re.findall(r'\d+', folder)[0])
+    return int(re.findall(r'\d+', folder)[0]) - 1
 
 
 def get_data(path):
@@ -23,8 +24,10 @@ def get_data(path):
             data.append(image)
             labels.append(get_label(folder))
 
-    labels = to_categorical(labels)
+    labels = to_categorical(labels, num_classes=8)
     combined = list(zip(data, labels))
     random.shuffle(combined)
     data[:], labels[:] = zip(*combined)
+    data = np.array(data, dtype="float32")
+    labels = np.array(labels)
     return data, labels
