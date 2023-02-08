@@ -19,6 +19,7 @@ numpy = "^1.24.1"
 tensorflow = "2.11.0"
 setuptools = "^67.0.0"
 tensorboard = "^2.11.2"
+Pillow = "9.4.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.10.0"
