@@ -30,4 +30,4 @@ if __name__ == '__main__':
         validation_steps=len(testX) // BS,
         epochs=EPOCHS)
 
-    model.save("texture_classification", save_format="h5")
+    classification_model.save("texture_classification", save_format="h5")
