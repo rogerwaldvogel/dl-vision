@@ -14,7 +14,7 @@ def get_model():
     head_model = base_model.output
     head_model = Flatten(name="flatten")(head_model)
     head_model = Dense(128, activation="relu")(head_model)
-    head_model = Dropout(0.5)(head_model)
+    head_model = Dropout(0.2)(head_model)
     head_model = Dense(8, activation="softmax")(head_model)
     model = Model(inputs=base_model.input, outputs=head_model)
     # We don't want to train any layer in the MobileNetV2 network
