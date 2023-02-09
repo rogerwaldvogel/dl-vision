@@ -1,22 +1,23 @@
 import tensorflow as tf
-from tensorflow.keras.applications import MobileNetV2
 from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 
 
-class MobileNetV2Texture:
-    def __init__(self):
-        self.model = self._get_model()
+class ModelTexture:
+    def __init__(self, base_model, model_name):
+        self.model = self._get_model(base_model)
+        self.model_name = model_name
 
-    def _get_model(self):
-        base_model = MobileNetV2(weights="imagenet", include_top=False, input_tensor=Input(shape=(150, 150, 3)))
+    @staticmethod
+    def _get_model(base_model):
 
         head_model = base_model.output
         head_model = Flatten(name="flatten")(head_model)
-        head_model = Dense(256, activation="relu")(head_model)
+        head_model = Dense(2048, activation="relu")(head_model)
+        head_model = Dropout(0.2)(head_model)
+        head_model = Dense(1024, activation="relu")(head_model)
         head_model = Dropout(0.2)(head_model)
         head_model = Dense(8, activation="softmax")(head_model)
         model = Model(inputs=base_model.input, outputs=head_model)
@@ -30,12 +31,13 @@ class MobileNetV2Texture:
         self.model.compile(loss="categorical_crossentropy", optimizer=opt,
                            metrics=["accuracy"])
 
-    def train(self, aug, trainX, trainY, testX, testY, epochs=30, batch_size=32):
-        results = self.model.fit(
-            aug.flow(trainX, trainY, batch_size=batch_size),
-            steps_per_epoch=len(trainX) // batch_size,
-            validation_data=(testX, testY),
-            validation_steps=len(testX) // batch_size,
+    def train(self, aug, train_x, train_y, test_x, test_y, epochs=30, batch_size=32):
+
+        self.model.fit(
+            aug.flow(train_x, train_y, batch_size=batch_size),
+            steps_per_epoch=len(train_x) // batch_size,
+            validation_data=(test_x, test_y),
+            validation_steps=len(test_x) // batch_size,
             epochs=epochs)
 
-        self.model.save("mobile_net_v2_classification", save_format="h5")
+        self.model.save(f"{self.model_name}.h", save_format="h5")
