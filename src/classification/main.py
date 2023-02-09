@@ -2,18 +2,20 @@ import data_preparation
 import data_augmentation
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from model.ModelTexture import ModelTexture
+from model.custom_model import CustomModel
 from sklearn.model_selection import train_test_split
 
 from tensorflow.keras.layers import Input
 from tensorflow.keras.applications import MobileNetV2
 from tensorflow.keras.applications import Xception
 from tensorflow.keras.applications import InceptionResNetV2
+from tensorflow.keras.applications import ResNet50V2
 
 
 if __name__ == '__main__':
-    INIT_LR = 1e-4  # learning rate
+    INIT_LR = 1e-3  # learning rate
     EPOCHS = 50  # number of epochs
-    BS = 32  # batch size
+    BS = 64  # batch size
 
     data, labels = data_preparation.get_data('data/Kather_texture_2016_image_tiles_5000')
     (train_x, test_x, train_y, test_y) = train_test_split(data, labels,
@@ -40,7 +42,21 @@ if __name__ == '__main__':
     # model.configure_model(learning_rate=INIT_LR, weight_decay=INIT_LR / EPOCHS)
     # model.train(aug_per_epoch, train_x, train_y, test_x, test_y, epochs=EPOCHS, batch_size=BS)
 
-    base_model = InceptionResNetV2(weights="imagenet", include_top=False, input_tensor=Input(shape=(150, 150, 3)))
-    model = ModelTexture(base_model, "inceptionresnetv2")
-    model.configure_model(learning_rate=INIT_LR, weight_decay=INIT_LR / EPOCHS)
+    # base_model = InceptionResNetV2(weights="imagenet", include_top=False, input_tensor=Input(shape=(150, 150, 3)))
+    # model = ModelTexture(base_model, "inceptionresnetv2")
+    # model.configure_model(learning_rate=INIT_LR, weight_decay=INIT_LR / EPOCHS)
+    # model.train(aug_per_epoch, train_x, train_y, test_x, test_y, epochs=EPOCHS, batch_size=BS)
+
+    # base_model = InceptionResNetV2(weights="imagenet", include_top=False, input_tensor=Input(shape=(150, 150, 3)))
+    # model = ModelTexture(base_model, "inceptionresnetv2")
+    # model.configure_model(learning_rate=INIT_LR, weight_decay=INIT_LR / EPOCHS)
+    # model.train(aug_per_epoch, train_x, train_y, test_x, test_y, epochs=EPOCHS, batch_size=BS)
+
+    # base_model = ResNet50V2(weights="imagenet", include_top=False, input_tensor=Input(shape=(150, 150, 3)))
+    # model = ModelTexture(base_model, "resnet50v2")
+    # model.configure_model(learning_rate=INIT_LR, weight_decay=INIT_LR / EPOCHS)
+    # model.train(aug_per_epoch, train_x, train_y, test_x, test_y, epochs=EPOCHS, batch_size=BS)
+
+    model = CustomModel(None, "custom_model")
+    model.configure_model(learning_rate=INIT_LR, weight_decay=None)
     model.train(aug_per_epoch, train_x, train_y, test_x, test_y, epochs=EPOCHS, batch_size=BS)
