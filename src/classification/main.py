@@ -12,7 +12,7 @@ from tensorflow.keras.applications import InceptionResNetV2
 
 if __name__ == '__main__':
     INIT_LR = 1e-4  # learning rate
-    EPOCHS = 30  # number of epochs
+    EPOCHS = 50  # number of epochs
     BS = 32  # batch size
 
     data, labels = data_preparation.get_data('data/Kather_texture_2016_image_tiles_5000')
