@@ -32,12 +32,14 @@ class ModelTexture:
                            metrics=["accuracy"])
 
     def train(self, aug, train_x, train_y, test_x, test_y, epochs=30, batch_size=32):
-
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir="./logs")
+        early_stopping_callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=4)
         self.model.fit(
             aug.flow(train_x, train_y, batch_size=batch_size),
             steps_per_epoch=len(train_x) // batch_size,
             validation_data=(test_x, test_y),
             validation_steps=len(test_x) // batch_size,
-            epochs=epochs)
+            epochs=epochs,
+            callbacks=[tensorboard_callback, early_stopping_callback])
 
         self.model.save(f"{self.model_name}.h", save_format="h5")
