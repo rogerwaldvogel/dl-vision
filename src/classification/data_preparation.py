@@ -1,4 +1,5 @@
 import os
+import tensorflow as tf
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.preprocessing.image import load_img
@@ -20,7 +21,8 @@ def get_data(path):
             file_path = path + '/' + folder + '/' + file
             image = load_img(file_path, target_size=(150, 150))
             image = img_to_array(image)
-            image = preprocess_input(image)
+            image = tf.cast(image, tf.float32) / 255.0
+            # image = preprocess_input(image)
             data.append(image)
             labels.append(get_label(folder))
 
