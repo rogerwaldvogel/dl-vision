@@ -25,7 +25,8 @@ def get_data(path: str):
         tmp = []
         for file in files:
             img = Image.open(fldr_path + "/" + file)
-            imarray = normalize_resize(np.array(img))
+            #imarray = normalize_resize(np.array(img))
+            imarray = np.array(img)
             tmp.append(imarray)
         data_array.append(tmp)
     return cls_names, data_array
