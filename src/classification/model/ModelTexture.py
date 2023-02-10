@@ -14,12 +14,10 @@ class ModelTexture:
 
         head_model = base_model.output
         head_model = Flatten(name="flatten")(head_model)
-        # head_model = Dense(2048, activation="relu")(head_model)
-        # head_model = Dropout(0.2)(head_model)
-        head_model = Dense(32, activation="relu")(head_model)
+        head_model = Dense(128, activation="relu",
+                           activity_regularizer=tf.keras.regularizers.L2(0.001))(head_model)
         head_model = Dropout(0.2)(head_model)
-        head_model = Dense(32, activation="relu")(head_model)
-        head_model = Dropout(0.2)(head_model)
+        head_model = Dense(64, activation="relu")(head_model)
         head_model = Dense(8, activation="softmax")(head_model)
         model = Model(inputs=base_model.input, outputs=head_model)
         # We don't want to train any layer of the base model
@@ -27,17 +25,22 @@ class ModelTexture:
             layer.trainable = False
         return model
 
-    def configure_model(self, learning_rate=1e-4, weight_decay=1e-4):
-        opt = tf.keras.optimizers.Adam(learning_rate=learning_rate, weight_decay=weight_decay)
+    def configure_model(self, learning_rate=1e-4):
+        lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+            learning_rate,
+            decay_steps=100,
+            decay_rate=0.99,
+            staircase=True)
+
+        opt = tf.keras.optimizers.Adam(learning_rate=lr_schedule)
         self.model.compile(loss="categorical_crossentropy", optimizer=opt,
-                           metrics=["accuracy"])
+                           metrics=["accuracy", "Precision", "Recall"])
         print(self.model.summary())
 
-    def train(self, aug, train_x, train_y, test_x, test_y, epochs=30, batch_size=32):
+    def train(self, train_x, train_y, test_x, test_y, epochs=30, batch_size=32):
         tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir="./logs")
         early_stopping_callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=4)
         self.model.fit(
-            #aug.flow(train_x, train_y, batch_size=batch_size),
             x=train_x,
             y=train_y,
             steps_per_epoch=len(train_x) // batch_size,
@@ -47,3 +50,7 @@ class ModelTexture:
             callbacks=[tensorboard_callback, early_stopping_callback])
 
         self.model.save(f"{self.model_name}.h", save_format="h5")
+
+    def evaluate(self, test_x, test_y):
+        print("Evaluating model...")
+        self.model.evaluate(test_x, test_y)
