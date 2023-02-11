@@ -41,7 +41,7 @@ class ModelTexture:
     def train(self, train_x, train_y, val_x, val_y, epochs=30, batch_size=32):
         tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir="./logs")
         early_stopping_callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=4)
-        history = self.model.fit(
+        result = self.model.fit(
             x=train_x,
             y=train_y,
             steps_per_epoch=len(train_x) // batch_size,
@@ -51,7 +51,7 @@ class ModelTexture:
             callbacks=[tensorboard_callback, early_stopping_callback])
 
         self.model.save(f"{self.model_name}.h", save_format="h5")
-        np.save(f'{self.model_name}.npy', history.history)
+        np.save(f'{self.model_name}.npy', result)
 
     def evaluate(self, test_x, test_y):
         print("Evaluating model...")
