@@ -36,10 +36,10 @@ if __name__ == '__main__':
     #                         input_shape=(150, 150, 3))
     # model = ModelTexture(base_model, "resnet50v2")
     # model.configure_model(learning_rate=INIT_LR)
-    # model.train(aug_per_epoch, train_x, train_y, test_x, test_y, epochs=EPOCHS, batch_size=BS)
+    # model.train(train_x, train_y, test_x, test_y, epochs=EPOCHS, batch_size=BS)
 
     # model = CustomModel(None, "custom_model")
     # model.configure_model(learning_rate=INIT_LR)
-    # model.train(aug_per_epoch, train_x, train_y, test_x, test_y, epochs=EPOCHS, batch_size=BS)
+    # model.train(train_x, train_y, test_x, test_y, epochs=EPOCHS, batch_size=BS)
 
     model.evaluate(test_x, test_y)
