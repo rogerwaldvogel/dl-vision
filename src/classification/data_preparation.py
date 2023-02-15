@@ -8,7 +8,7 @@ import re
 import numpy as np
 import pickle
 
-import data_augmentation
+import classification.data_augmentation as data_augmentation
 
 
 def load_data():
@@ -34,19 +34,20 @@ def get_label(folder):
     return int(re.findall(r'\d+', folder)[0]) - 1
 
 
-def get_data(path):
+def get_data(path, convert_to_categorical=True, target_size=(150, 150)):
     data = []
     labels = []
     for folder in os.listdir(path):
         for file in os.listdir(path + '/' + folder):
             file_path = path + '/' + folder + '/' + file
-            image = load_img(file_path, target_size=(150, 150))
+            image = load_img(file_path, target_size=target_size)
             image = img_to_array(image)
             image = tf.cast(image, tf.float32) / 255.0
             data.append(image)
             labels.append(get_label(folder))
 
-    labels = to_categorical(labels, num_classes=8)
+    if convert_to_categorical:
+        labels = to_categorical(labels, num_classes=8)
     data = np.array(data, dtype="float32")
     labels = np.array(labels)
     return data, labels
