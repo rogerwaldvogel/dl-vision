@@ -51,8 +51,12 @@ class ModelTexture:
             callbacks=[tensorboard_callback, early_stopping_callback])
 
         self.model.save(f"{self.model_name}.h", save_format="h5")
-        np.save(f'{self.model_name}.npy', result)
+        np.save(f'{self.model_name}.npy', result.history)
 
     def evaluate(self, test_x, test_y):
         print("Evaluating model...")
-        self.model.evaluate(test_x, test_y)
+        result = self.model.evaluate(test_x, test_y)
+        np.save(f'{self.model_name}_test.npy', {"loos": result[0],
+                                                "accuracy": result[1],
+                                                "precision": result[2],
+                                                "recall": result[3]})
