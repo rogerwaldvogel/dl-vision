@@ -20,6 +20,7 @@ if __name__ == '__main__':
     model = ModelTexture(base_model, "mobilenetv2")
     model.configure_model(learning_rate=INIT_LR)
     model.train(train_x, train_y, val_x, val_y, epochs=EPOCHS, batch_size=BS)
+    model.evaluate(test_x, test_y)
 
     # ResNet50V2 training
     base_model = ResNet50V2(weights="imagenet", include_top=False,
@@ -28,10 +29,10 @@ if __name__ == '__main__':
     model = ModelTexture(base_model, "resnet50v2")
     model.configure_model(learning_rate=INIT_LR)
     model.train(train_x, train_y, test_x, test_y, epochs=EPOCHS, batch_size=BS)
+    model.evaluate(test_x, test_y)
 
     # Custom CNN model training
     model = CustomModel(None, "custom_model")
     model.configure_model(learning_rate=INIT_LR)
     model.train(train_x, train_y, test_x, test_y, epochs=EPOCHS, batch_size=BS)
-
     model.evaluate(test_x, test_y)
