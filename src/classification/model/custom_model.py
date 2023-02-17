@@ -1,8 +1,8 @@
-from .ModelTexture import ModelTexture
+from .model_histopathologic import ModelHistopathologic
 import tensorflow as tf
 
 
-class CustomModel(ModelTexture):
+class CustomModel(ModelHistopathologic):
     def __init__(self, base_model, model_name):
         super().__init__(base_model, model_name)
 
