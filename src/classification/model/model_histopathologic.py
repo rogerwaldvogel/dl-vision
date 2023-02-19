@@ -10,10 +10,11 @@ from .tensorboard_lime import TensorBoardLime
 
 
 class ModelHistopathologic:
-    def __init__(self, base_model, model_name):
+    def __init__(self, base_model, model_name, lime_images_category):
         self.model = self._get_model(base_model)
         self.model_name = model_name
         self.run_time_log = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        self.lime_images_category = lime_images_category
 
     def _get_model(self, base_model):
         head_model = base_model.output
@@ -45,10 +46,10 @@ class ModelHistopathologic:
     def train(self, train_x, train_y, val_x, val_y, epochs=30, batch_size=32):
         log_dir = f"logs/{self.model_name}/" + self.run_time_log
         tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
-        early_stopping_callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=4)
+        early_stopping_callback = tf.keras.callbacks.EarlyStopping(patience=4)
         tensor_bord_cm = TensorBoardCM(self.model, log_dir, val_x, val_y)
         cm_callback = tf.keras.callbacks.LambdaCallback(on_epoch_end=tensor_bord_cm.log_confusion_matrix)
-        tensor_bord_lime = TensorBoardLime(self.model, log_dir, val_x, val_y, 2)
+        tensor_bord_lime = TensorBoardLime(self.model, log_dir, val_x, val_y, self.lime_images_category)
         lime_callback = tf.keras.callbacks.LambdaCallback(on_epoch_end=tensor_bord_lime.log_lime)
 
         result = self.model.fit(

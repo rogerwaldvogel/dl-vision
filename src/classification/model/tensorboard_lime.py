@@ -6,13 +6,13 @@ from .tensorboard_image import save_image_to_tensorboard
 
 
 class TensorBoardLime:
-    def __init__(self, model, log_dir, val_images, val_labels, number_of_images_per_category):
+    def __init__(self, model, log_dir, val_images, val_labels, val_images_category):
         self.model = model
         self.log_dir = log_dir
         self.val_images = val_images
         self.val_labels = np.argmax(val_labels, axis=1)
-        self.number_of_images_per_category = number_of_images_per_category
-        self.val_images_category = self._get_images_per_category(self.val_images, self.val_labels)
+        self.number_of_images_per_category = len(val_images_category[0])
+        self.val_images_category = val_images_category
         self.class_names = ["Tumor", "Stroma", "Complex", "Lympho", "Debris", "Mucosa", "Adipose", "Empty"]
 
     def log_lime(self, epoch, logs):
@@ -47,21 +47,3 @@ class TensorBoardLime:
                 plt.colorbar(im, ax=axis, shrink=0.7)
 
         save_image_to_tensorboard(fig, self.log_dir + "/lime", category_name, epoch)
-
-    def _get_images_per_category(self, val_images, val_labels):
-        category = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []}
-        for index, val_image in enumerate(val_images):
-            label = val_labels[index]
-            if len(category[label]) < self.number_of_images_per_category:
-                category[label].append(val_image)
-            if not self._check_proceed(category.values(), self.number_of_images_per_category):
-                break
-
-        return category
-
-    @staticmethod
-    def _check_proceed(items, number_of_images_per_category):
-        for items in items:
-            if len(items) < number_of_images_per_category:
-                return True
-        return False
