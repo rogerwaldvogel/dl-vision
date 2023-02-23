@@ -1,6 +1,7 @@
 from PIL import Image
 import tensorflow as tf
 import os
+import numpy as np
 
 files = os.listdir("data/large_images/")
 for file in files:
