@@ -1,19 +1,15 @@
 import sliding_window
 import numpy as np
-import os
-import matplotlib.pyplot as plt
 import keras
-from PIL import Image
-import tensorflow as tf
-from matplotlib import gridspec
-import math
 import plotly
 import pandas as pd
 
+# Define classes and large images
 classes = [0, 1, 2, 3, 4, 5, 6]
 img_ind = 1
 imgs = sliding_window.load_images("data/large_images/", raw=False)
 
+# Load models
 model_cst = keras.models.load_model("models/custom_model.h")
 custom = sliding_window.sliding_window(width_x=150, width_y=150, classes=classes, model=model_cst, image=imgs[img_ind])
 custom_mat = sliding_window.threshold2(sliding_window.list_to_mat(pred_list=custom, nwindows=33), 0.5)
@@ -28,25 +24,41 @@ mobilenet_mat = sliding_window.threshold2(sliding_window.list_to_mat(pred_list=m
 print("Loaded all models")
 print("Generating Hover Matrix")
 
+
 def add_all():
+    """
+    Add all model outputs together
+    """
     fin = []
     for num in range(7):
         fin.append(custom_mat[num] + resnet_mat[num] + mobilenet_mat[num])
     return fin
 
+
 def add_res_mob():
+    """
+    Add resnet and mobilenet model outputs together
+    """
     fin = []
     for num in range(7):
         fin.append(resnet_mat[num] + mobilenet_mat[num])
     return fin
 
+
 def add_res_cust():
+    """
+    Add custom and resnet model outputs together
+    """
     fin = []
     for num in range(7):
         fin.append(custom_mat[num] + resnet_mat[num])
     return fin
 
+
 def add_mob_cust():
+    """
+    Add custom and mobilenet model outputs together
+    """
     fin = []
     for num in range(7):
         fin.append(custom_mat[num] + mobilenet_mat[num])
@@ -54,6 +66,12 @@ def add_mob_cust():
 
 
 def hover_all(ind: int):
+    """
+    Detect which model (of all models) predicts true and which false.
+    Depending on the result, write the text into a list
+    :param ind: Which category should be used (cancer, adipose etc.)
+    :return: list
+    """
     hover_all = []
     for row in range(33):
         for col in range(33):
@@ -78,50 +96,78 @@ def hover_all(ind: int):
 
 
 def hover_res_mob(ind: int):
-    hover_res_mob = []
+    """
+    Detect which model (resnet and mobilenet) predicts true and which false.
+    Depending on the result, write the text into a list
+    :param ind: Which category should be used (cancer, adipose etc.)
+    :return: list
+    """
+    hover_mob_res = []
     for row in range(33):
         for col in range(33):
             if resnet_mat[ind][row, col] == mobilenet_mat[ind][row, col] == 1:
-                hover_res_mob.append(["Both models"])
+                hover_mob_res.append(["Both models"])
             elif (resnet_mat[ind][row, col] == 1) & (mobilenet_mat[ind][row, col] == 0):
-                hover_res_mob.append(["Only Resnet Model"])
+                hover_mob_res.append(["Only Resnet Model"])
             elif (resnet_mat[ind][row, col] == 0) & (mobilenet_mat[ind][row, col] == 1):
-                hover_res_mob.append(["Only Mobilenet Model"])
+                hover_mob_res.append(["Only Mobilenet Model"])
             else:
-                hover_res_mob.append(["No Model"])
-    return hover_res_mob
+                hover_mob_res.append(["No Model"])
+    return hover_mob_res
+
 
 def hover_res_cust(ind: int):
-    hover_res_mob = []
+    """
+    Detect which model (resnet and mobilenet) predicts true and which false.
+    Depending on the result, write the text into a list
+    :param ind: Which category should be used (cancer, adipose etc.)
+    :return: list
+    """
+    hover_cust_res = []
     for row in range(33):
         for col in range(33):
             if resnet_mat[ind][row, col] == custom_mat[ind][row, col] == 1:
-                hover_res_mob.append(["Both models"])
+                hover_cust_res.append(["Both models"])
             elif (resnet_mat[ind][row, col] == 1) & (custom_mat[ind][row, col] == 0):
-                hover_res_mob.append(["Only Resnet Model"])
+                hover_cust_res.append(["Only Resnet Model"])
             elif (resnet_mat[ind][row, col] == 0) & (custom_mat[ind][row, col] == 1):
-                hover_res_mob.append(["Only Custom Model"])
+                hover_cust_res.append(["Only Custom Model"])
             else:
-                hover_res_mob.append(["No Model"])
-    return hover_res_mob
+                hover_cust_res.append(["No Model"])
+    return hover_cust_res
+
 
 def hover_mob_cust(ind: int):
-    hover_res_mob = []
+    """
+    Detect which model (custom and mobilenet) predicts true and which false.
+    Depending on the result, write the text into a list
+    :param ind: Which category should be used (cancer, adipose etc.)
+    :return: list
+    """
+    hover_cust_mob = []
     for row in range(33):
         for col in range(33):
             if mobilenet_mat[ind][row, col] == custom_mat[ind][row, col] == 1:
-                hover_res_mob.append(["Both models"])
+                hover_cust_mob.append(["Both models"])
             elif (mobilenet_mat[ind][row, col] == 1) & (custom_mat[ind][row, col] == 0):
-                hover_res_mob.append(["Only Mobilenet Model"])
+                hover_cust_mob.append(["Only Mobilenet Model"])
             elif (mobilenet_mat[ind][row, col] == 0) & (custom_mat[ind][row, col] == 1):
-                hover_res_mob.append(["Only Custom Model"])
+                hover_cust_mob.append(["Only Custom Model"])
             else:
-                hover_res_mob.append(["No Model"])
-    return hover_res_mob
+                hover_cust_mob.append(["No Model"])
+    return hover_cust_mob
 
 
 def hover_plt(hover_text: list, tot_scores, ind: int, save: bool, name: None):
-
+    """
+    Create the plotly graphic to hover.
+    :param hover_text: list from the model hover text generation
+    :param tot_scores: Give the total scores from the model addition
+    :param ind: Which category should be used (cancer, adipose etc.)
+    :param save: Should the resulting graphic be saved
+    :param name: If save, what name should the object have
+    :return: html graphic
+    """
     zz = pd.DataFrame(np.vstack(sliding_window.list_to_mat(pred_list=hover_text, nwindows=33)))
 
     x = zz.columns.tolist()
