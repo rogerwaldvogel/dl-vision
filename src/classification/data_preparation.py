@@ -8,7 +8,7 @@ import re
 import numpy as np
 import pickle
 
-import data_augmentation as data_augmentation
+import src.classification.data_augmentation as data_augmentation
 
 
 def load_data():
